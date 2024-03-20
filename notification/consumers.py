@@ -39,14 +39,15 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                     'id': notification.id,
                     'content': notification.content,
                     'timestamp': str(notification.timestamp),
+                
                 }
 
-                # Send the notification to the recipient's channel group
+                # Send the notification to the recipient's channel groupppp
                 channel_layer = get_channel_layer()
                 await channel_layer.group_send(
                     "notifications",  # Name of the channel group
                     {
-                        'type': 'send_notification',  # Event type aanu 
+                        'type': 'send_notification',  
                         'recipient': recipient_data,
                         'notification': notification_data,
                     }

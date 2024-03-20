@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import *
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from rest_framework import status
 
 class MentorSignupView(APIView):
     def post(self, request):
@@ -67,7 +67,6 @@ class MentorOnboard(APIView):
         mentor_profile.certificate=certificate
         mentor_profile.availability_start_time = availability_start_time
         mentor_profile.availability_end_time = availability_end_time
-        # mentor_profile.is_approved = False
         mentor_profile.save()
         return Response({"message":"success"})
     
@@ -103,7 +102,7 @@ class CreateclassView(APIView):
 class ClassdetailsView(APIView):
     def get(self,get):
         classdetails=Class.objects.all()
-        print(classdetails,"enth kunthann")
+        print(classdetails,"enth ")
         if classdetails:
             serializer=ClassSerializer(classdetails,many=True)
             return Response({'message':'passed','userdata':serializer.data})
@@ -174,44 +173,46 @@ class MentorAvailabilityView(APIView):
         except MentorProfile.DoesNotExist:
             return Response({"error": "Mentor not found"})
 
-class StoreOrderView(APIView):
-    def post(self, request):
-        try:
-            data = request.data
-            print(data,"nthoke datas vannitund")
-            # order_id = data.get('orderID')
-            client_id = data.get('clientID')
-            user_details = data.get('userDetails') 
-            course_details = data.get('courseDetails')
+# class StoreOrderView(APIView):
+#     def post(self, request):
+#         try:
+#             data = request.data
+#             print(data,"nthoke datas vannitund")
+#             order_id = data.get('orderID')
+#             client_id = data.get('clientID')
+#             user_details = data.get('userDetails') 
+#             print(user_details,"userdetails enthoke")
+#             course_details = data.get('courseDetails')
+#             print(course_details,"course details vanno")
+#             print(user_details,client_id,"user details oo") 
+
+#             user_profile = UserProfile.objects.get(username=user_details.get('username'))
+#             print(user_profile,"nthaaaaaaaaaaaaaaaaaaaaa")
+
+
+#             user_id = user_details.get('id')  
+#             print(user_id,"...................................kk")
+#             course_id = course_details.get('class_id')
+#             print(course_id,";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;kk")  
+#             class_name = course_details.get('class_name')
+#             booked_class = Class.objects.get(class_name=class_name)
+#             print(booked_class,"booked claasil enthokke")
+
+#             order = Order.objects.create(
+#                 student_id=user_id,
+#                 booked_class=booked_class,
+#                 payment_amount=course_details.get('price'),
+                
+#             )
             
-            print(course_details,"course details vanno")
-            print(user_details,client_id,"user details oo") 
-            user_profile = UserProfile.objects.get(username=user_details.get('username'))
-            print(user_profile,"nthaaaaaaaaaaaaaaaaaaaaa")
-
-
-            user_id = user_details.get('id')  
-            print(user_id,"...................................kk")
-            course_id = course_details.get('class_id')
-            print(course_id,";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;kk")  
-            class_name = course_details.get('class_name')
-            booked_class = Class.objects.get(class_name=class_name)
-            print(booked_class,"booked claasil enthokke")
-
-            order = Order.objects.create(
-                student_id=user_id,
-                booked_class=booked_class,
-                payment_amount=course_details.get('price'),
-            )
-            
-            print(order,"order create aayo")
-            serializer = OrderSerializer(order)
-            print(serializer.data,"for passing order id,for date and time booking")
+#             print(order,"order create aayo")
+#             serializer = OrderSerializer(order)
+#             print(serializer.data,"for passing order id,for date and time booking")
         
 
-            return Response({'success': True, 'message': 'Order details stored successfully', 'order': serializer.data})
-        except Exception as e:
-             return Response({'success': False, 'message': str(e)})
+#             return Response({'success': True, 'message': 'Order details stored successfully', 'order': serializer.data})
+#         except Exception as e:
+#              return Response({'success': False, 'message': str(e)})
          
 
 class UpdateBookingDetailsView(APIView):
@@ -243,17 +244,95 @@ class UpdateBookingDetailsView(APIView):
 
         except Exception as e:
             return Response({'success': False, 'message': str(e)})
+        
 
 
+class StoreOrderView(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            print(data, "nthoke datas vannitund")
+            order_id = data.get('orderID')
+            client_id = data.get('clientID')
+            user_details = data.get('userDetails')
+            print(user_details, "userdetails enthoke")
+            course_details = data.get('courseDetails')
+            print(course_details, "course details vanno")
+            print(user_details, client_id, "user details oo")
+
+            user_profile = UserProfile.objects.get(username=user_details.get('username'))
+            print(user_profile, "nthaaaaaaaaaaaaaaaaaaaaa")
+
+            user_id = user_details.get('id')
+            print(user_id, "...................................kk")
+            class_name = course_details.get('class_name')
+            booked_class = Class.objects.get(class_name=class_name)
+            print(booked_class, "booked claasil enthokke")
+            payment_amount = course_details.get('price')
+            mentor_id = course_details.get('mentor')
+            print(mentor_id, 'mentor id from course details')
+
+            # If mentor_id is a tuple, get the first element assuming it's the ID
+            if isinstance(mentor_id, tuple):
+                mentor_id = mentor_id[0]
+
+            mentor_profile = MentorProfile.objects.get(pk=mentor_id)
+            print(mentor_profile)
+
+            order = Order.objects.create(
+                student=user_profile,
+                booked_class=booked_class,
+                payment_amount=payment_amount,
+                mentor=mentor_profile,
+            )
+
+            print(order, "order create aayo")
+            serializer = OrderSerializer(order)
+            print(serializer.data, "for passing order id, for date and time booking")
+
+            return Response({'success': True, 'message': 'Order details stored successfully', 'order': serializer.data})
+        except Exception as e:
+            return Response({'success': False, 'message': str(e)})
+      
+
+
+
+# class EntrolledStudentsView(APIView):
+#     def get(self,request,mentor_id):
+#         print(mentor_id, "allllllllllllaaaa")
+#         data = request.data
+#         print(data,"ntha avastha")
+#         mentor_id=request.GET.get('mentorId ')
+#         print(mentor_id,"mentor id vannooooi")
+
+#         if mentor_id is None:
+#             return Response({'error': 'Mentor ID parameter is required'})
+#         # order_obj = Order.objects.filter(mentor_id=mentor_id)
+#         order_obj=Order.objects.all()
+#         print(order_obj,"hiiiiiiii")
+#         serializer = OrderSerializer(order_obj, many=True)
+#         print(serializer.data)
+#         return Response({'success': True, 'userdata':serializer.data})
+    
 class EntrolledStudentsView(APIView):
-    def get(self,request):
-        order_obj=Order.objects.all()
+    def post(self,request):
+        data = request.data
+        print(data,"ntha avastha")
+        mentorId = request.data.get('mentorId')
+        print(mentorId,"othiri kashtapettu ninne kitan")
+        # mentor = MentorProfile.objects.get(id=mentor_id)
+        order_obj = Order.objects.filter(mentor=mentorId)
+        # order_obj=Order.objects.all()
         print(order_obj,"hiiiiiiii")
         serializer = OrderSerializer(order_obj, many=True)
         print(serializer.data)
         return Response({'success': True, 'userdata':serializer.data})
-    
-    
+
+
+
+
+
+   
     
 
 class ConfirmBookingView(APIView):

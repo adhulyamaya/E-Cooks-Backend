@@ -15,6 +15,7 @@ urlpatterns = [
     path('searchuser/',SearchView.as_view(),name="searchuser"),
     path('course-listing/',CourseListing.as_view(),name="courselisting"),
     path('purchased-courses/',PurchasedCourseListing.as_view(),name="purchased-courses")
+    
 
 
 ]

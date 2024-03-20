@@ -10,32 +10,11 @@ from myapp.api.serializers import *
 from mentorapp.api.serializers import *
 from rest_framework_simplejwt.tokens import RefreshToken
 
-# class AdminLoginView(APIView):
-#     def post(self, request):
-#         username = request.data.get('username')
-#         password = request.data.get('password')
-        
-
-#         adminobj=AdminProfile.objects.get(username=username,password=password)
-#         if adminobj:
-#             refresh = RefreshToken.for_user(adminobj)
-#             serialized=AdminProfileSerializer(adminobj)
-#             print(serialized.data,"{{{{{{serialized.data}}}}}}")
-
-#             return Response({'message': 'success',"userdata":serialized.data,"refresh":str(refresh),"access":str(refresh.access_token)})
-#         else:
-#             return Response({'message': 'Invalid credentials'})
-
 class AdminLoginView(APIView):
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
-        
-        try:
-            admin_obj = AdminProfile.objects.get(username=username, password=password)
-            print(admin_obj,"vannoooooo")
-        except AdminProfile.DoesNotExist:
-            return Response({'message': 'Invalid credentials'})
+        admin_obj = AdminProfile.objects.create(username=username,password=password)
 
         refresh = RefreshToken.for_user(admin_obj)
         serialized = AdminProfileSerializer(admin_obj)
@@ -47,6 +26,8 @@ class AdminLoginView(APIView):
             'refresh': str(refresh),
             'access': str(refresh.access_token),
         })
+    
+    
 
         
 class AdminprofileView(APIView):
@@ -76,7 +57,7 @@ class ClasslistView(APIView):
 class MentorApprovalView(APIView):
     def post(self, request):
         mentor_id = request.data.get('mentor_id')
-        print(mentor_id,"FRIDAY NATTIL POVANE.....")
+        print(mentor_id,"...")
         is_approved = request.data.get('is_approved')
         print(is_approved,"STATUS")
 
@@ -89,16 +70,15 @@ class MentorApprovalView(APIView):
             return Response({"message": "success", "mentor_data": serializer.data})
         except MentorProfile.DoesNotExist:
             return Response({"message": "Mentor not found"})
+        
 
-
-
-# class ToggleBlockUnblockView(APIView):
-#     def post(self, request, user_id):
-#         user_profiles = UserProfile.objects.filter(id=user_id)
-#         user_profiles.blocked = not user_profiles.blocked
-#         user_profiles.save()
-
-#         return Response({'success': True})
+class EntrolledStudentsCourselisting(APIView):
+    def get(self,request):
+        order_obj=Order.objects.all()
+        print(order_obj,"hiiiiiiii")
+        serializer = OrderSerializer(order_obj, many=True)
+        print(serializer.data)
+        return Response({'success': True, 'userdata':serializer.data})
 
 
 class ToggleBlockUnblockView(APIView):
