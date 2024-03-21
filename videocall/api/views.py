@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from  .serializers import VideoCallSessionSerializer
 
 class VideocallView(APIView):
     def post(self, request, *args, **kwargs):
@@ -32,7 +33,11 @@ class VideocallView(APIView):
             'mentor_id': mentor_id,
             'student_id': student_id,
         }
+        serializer = VideoCallSessionSerializer(video_call_session)
+        print (serializer.data,"videocalllllllllllllllllllllllllllllllllllllllllllll")
         
-        return Response(response_data, status=status.HTTP_201_CREATED)
+        # return Response(response_data, status=status.HTTP_201_CREATED)
+        return Response({'success': True, 'message': 'videocallll successfully', 'response_data': serializer.data})
+    
 
  
