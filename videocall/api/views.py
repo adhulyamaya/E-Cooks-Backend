@@ -22,7 +22,8 @@ class VideocallView(APIView):
         # Create a VideoCallSession associated with the Order
         video_call_session = VideoCallSession.objects.create(
             order=order,
-            channel_name=f"video_call_{mentor_id}_{student_id}"  # Generate a unique channel name
+            channel_name='hi'
+            # channel_name=f"video_call_{mentor_id}_{student_id}"  # Generate a unique channel name
         )
         
         # Return a success response with the video call session details

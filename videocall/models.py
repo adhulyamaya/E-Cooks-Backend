@@ -9,7 +9,7 @@ class VideoCallSession(models.Model):
     channel_name = models.CharField(max_length=255, default='video_call_{uuid.uuid4().hex}')
   
     def __str__(self):
-        return f'Video call session for Order ID: {self.order.pk}'
+       return f'Video call session Id: {self.pk}, for Order ID: {self.order.pk}'
 
-    class Meta:
-        ordering = ['-start_time']
+
+
