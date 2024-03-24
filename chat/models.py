@@ -3,14 +3,14 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 class ChatMessage(models.Model):
-    sender_type = models.CharField(max_length=10, choices=(('user', 'User'), ('mentor', 'Mentor')))
+    sender_type = models.CharField(max_length=10, choices=(('user', 'User'), ('mentor', 'Mentor')),default='user')
     sender = models.ForeignKey(
         'myapp.UserProfile',  
         on_delete=models.CASCADE,
         related_name='sent_messages',
         null=True, blank=True
     )
-    receiver_type = models.CharField(max_length=10, choices=(('user', 'User'), ('mentor', 'Mentor')))
+    receiver_type = models.CharField(max_length=10, choices=(('user', 'User'), ('mentor', 'Mentor')),default='user')
     receiver = models.ForeignKey(
         'mentorapp.MentorProfile', 
         on_delete=models.CASCADE,
